@@ -1,0 +1,13 @@
+﻿<Window x:Class="Cédric_Vindevogel___Project_OOP.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Cédric_Vindevogel___Project_OOP"
+        mc:Ignorable="d"
+        Title="Project OOP" SizeToContent="WidthAndHeight">
+    <StackPanel>
+        <TextBox Name="tbxIngave" Text="Geef tekst in" Width="400"></TextBox>
+        <Button x:Name="btnToonTekst" Content="Klik om tekst te tonen"></Button>
+    </StackPanel>
+</Window>
