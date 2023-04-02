@@ -24,5 +24,12 @@ namespace Cédric_Vindevogel___Project_OOP
         {
             InitializeComponent();
         }
+
+        private void Add_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox item = new CheckBox();
+            item.Content = tbxToevoegen.Text;
+            lbxLichtkrant.Items.Add(item);
+        }
     }
 }
