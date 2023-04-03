@@ -72,9 +72,21 @@ namespace Cédric_Vindevogel___Project_OOP
 
         private void SendData()
         {
+            string cbx1text = "";
+            string cbx2text = "";
             string pagina = "A";
 
-            _serialPort.Write("<ID01><RP" + pagina + ">" + Convert.ToChar(13) + Convert.ToChar(10));
+            if (cbx1.IsChecked == true)
+            {
+                cbx1text = (cbx1.Content.ToString());
+                _serialPort.Write("<ID01><RP" + pagina + ">" + cbx1text + Convert.ToChar(13) + Convert.ToChar(10));
+            }
+
+            if (cbx2.IsChecked == true)
+            {
+                cbx2text = (cbx2.Content.ToString());
+                _serialPort.Write("<ID01><RP" + pagina + ">" + cbx2text + Convert.ToChar(13) + Convert.ToChar(10));
+            }
         }
     }
 }

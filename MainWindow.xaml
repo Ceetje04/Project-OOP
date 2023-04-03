@@ -14,8 +14,8 @@
         <TextBox Name="tbxToevoegen" Margin="10"/>
         <Button Name="Add" Content="Toevoegen" Margin="10" Click="Add_Click"/>
         <ListBox x:Name="lbxLichtkrant" Margin="10">
-            <CheckBox Content="Datum + tijd" HorizontalAlignment="Center" IsChecked="True"></CheckBox>
-            <CheckBox Content="STUW voetbaltornooi" HorizontalAlignment="Center" IsChecked="True"></CheckBox>
+            <CheckBox Name="cbx1" Content="Datum + tijd" HorizontalAlignment="Center" IsChecked="True"></CheckBox>
+            <CheckBox Name="cbx2" Content="STUW voetbaltornooi" HorizontalAlignment="Center" IsChecked="True"></CheckBox>
         </ListBox>
     </StackPanel>
 </Window>
