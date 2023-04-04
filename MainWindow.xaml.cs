@@ -62,31 +62,58 @@ namespace Cédric_Vindevogel___Project_OOP
         //    }
         //}
 
-        private void Add_Click(object sender, RoutedEventArgs e)
+        private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
             CheckBox item = new CheckBox();
             item.Content = tbxToevoegen.Text;
             lbxLichtkrant.Items.Add(item);
+        }
+
+        private void btnUpdate_Click(object sender, RoutedEventArgs e)
+        {
             SendData();
+        }
+
+        private List<Tuple<string, string>> GetSelectedMessages()
+        {
+            var messages = new List<Tuple<string, string>>();
+
+            // Aangevinkte checkboxes toevoegen aan de lijst met berichten
+            if (cbx1.IsChecked == true)
+            {
+                messages.Add(new Tuple<string, string>(cbx1.Content.ToString(), "A"));
+            }
+            if (cbx2.IsChecked == true)
+            {
+                messages.Add(new Tuple<string, string>(cbx2.Content.ToString(), "B"));
+            }
+
+            return messages;
         }
 
         private void SendData()
         {
-            string cbx1text = "";
-            string cbx2text = "";
-            string pagina = "A";
-
-            if (cbx1.IsChecked == true)
+            foreach (var message in GetSelectedMessages())
             {
-                cbx1text = (cbx1.Content.ToString());
-                _serialPort.Write("<ID01><RP" + pagina + ">" + cbx1text + Convert.ToChar(13) + Convert.ToChar(10));
+                // Berichttekst en pagina gebruiken om het commando samen te stellen
+                _serialPort.Write("<ID01><RP" + message.Item2 + ">" + message.Item1 + Convert.ToChar(13) + Convert.ToChar(10));
             }
 
-            if (cbx2.IsChecked == true)
-            {
-                cbx2text = (cbx2.Content.ToString());
-                _serialPort.Write("<ID01><RP" + pagina + ">" + cbx2text + Convert.ToChar(13) + Convert.ToChar(10));
-            }
+            //string cbx1text = "";
+            //string cbx2text = "";
+            //string pagina = "A";
+
+            //if (cbx1.IsChecked == true)
+            //{
+            //    cbx1text = (cbx1.Content.ToString());
+            //    _serialPort.Write("<ID01><RP" + pagina + ">" + cbx1text + Convert.ToChar(13) + Convert.ToChar(10));
+            //}
+
+            //if (cbx2.IsChecked == true)
+            //{
+            //    cbx2text = (cbx2.Content.ToString());
+            //    _serialPort.Write("<ID01><RP" + pagina + ">" + cbx2text + Convert.ToChar(13) + Convert.ToChar(10));
+            //}
         }
     }
 }

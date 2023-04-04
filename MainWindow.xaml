@@ -12,10 +12,11 @@
         </GroupBox>-->
         
         <TextBox Name="tbxToevoegen" Margin="10"/>
-        <Button Name="Add" Content="Toevoegen" Margin="10" Click="Add_Click"/>
+        <Button Name="btnAdd" Content="Toevoegen" Margin="10" Click="btnAdd_Click"/>
         <ListBox x:Name="lbxLichtkrant" Margin="10">
             <CheckBox Name="cbx1" Content="Datum + tijd" HorizontalAlignment="Center" IsChecked="True"></CheckBox>
             <CheckBox Name="cbx2" Content="STUW voetbaltornooi" HorizontalAlignment="Center" IsChecked="True"></CheckBox>
         </ListBox>
+        <Button Name="btnUpdate" Content="Update lichtkrant" Margin="10" Click="btnUpdate_Click"></Button>
     </StackPanel>
 </Window>
