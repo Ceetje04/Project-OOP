@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO.Ports;
 using System.Drawing;
+using System.IO;
 
 namespace Cédric_Vindevogel___Project_OOP
 {
@@ -28,12 +29,11 @@ namespace Cédric_Vindevogel___Project_OOP
         {
             InitializeComponent();
 
-            _serialPort = new SerialPort("COM3");
-            _serialPort.Open();
+            _serialPort = new SerialPort();
 
-            //cbxComPorts.Items.Add("None");
-            //foreach (string port in SerialPort.GetPortNames())
-            //    cbxComPorts.Items.Add(port);
+            cbxComPorts.Items.Add("None");
+            foreach (string port in SerialPort.GetPortNames())
+                cbxComPorts.Items.Add(port);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -47,20 +47,20 @@ namespace Cédric_Vindevogel___Project_OOP
             }
         }
 
-        //private void cbxComPorts_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if (_serialPort != null)
-        //    {
-        //        if (_serialPort.IsOpen)
-        //            _serialPort.Close();
+        private void cbxComPorts_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_serialPort != null)
+            {
+                if (_serialPort.IsOpen)
+                    _serialPort.Close();
 
-        //        if (cbxComPorts.SelectedItem.ToString() != "None")
-        //        {
-        //            _serialPort.PortName = cbxComPorts.SelectedItem.ToString();
-        //            _serialPort.Open();
-        //        }
-        //    }
-        //}
+                if (cbxComPorts.SelectedItem.ToString() != "None")
+                {
+                    _serialPort.PortName = cbxComPorts.SelectedItem.ToString();
+                    _serialPort.Open();
+                }
+            }
+        }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
@@ -74,18 +74,40 @@ namespace Cédric_Vindevogel___Project_OOP
             SendData();
         }
 
-        private List<Tuple<string, string>> GetSelectedMessages()
+        private List<Tuple<string, string>> GetSelectedMessages() // Maakt een lijst van berichten en de pagina waarbij ze horen.
         {
-            var messages = new List<Tuple<string, string>>();
+            var messages = new List<Tuple<string, string>>(); // Tuple is om meedere dingen samen te versturen.
 
-            // Aangevinkte checkboxes toevoegen aan de lijst met berichten
-            if (cbx1.IsChecked == true)
+            //if (cbx1.IsChecked == true) // Als de checkbox is aangevinkt.
+            //{
+            //    messages.Add(new Tuple<string, string>("A", cbx1.Content.ToString()));
+            //}
+            //if (cbx2.IsChecked == true)
+            //{
+            //    messages.Add(new Tuple<string, string>("B", cbx2.Content.ToString()));
+            //}
+            ////if (cbx3.IsChecked == true)
+            ////{
+            ////    messages.Add(new Tuple<string, string>("C", cbx3.Content.ToString()));
+            ////}
+            ///
+
+            int pageNumber = 1;
+            foreach (CheckBox cb in lbxLichtkrant.Items) // Voor alle checkboxes in de list wordt deze code doorlopen.
             {
-                messages.Add(new Tuple<string, string>(cbx1.Content.ToString(), "A"));
+                if (cb.IsChecked == true) // Als de checkbox is aangevinkt wordt een nieuwe boodschap toegevoegd aan de list.
+                {
+                    string pageLetter = ((char)('A' + pageNumber - 1)).ToString(); // Bereken de paginaletter op basis van het paginanummer.
+                    messages.Add(new Tuple<string, string>(pageLetter, cb.Content.ToString())); // Voeg het bericht toe aan de lijst met de juiste paginainformatie.
+                    pageNumber++; // Verhoog het paginanummer voor de volgende checkbox.
+                }
             }
-            if (cbx2.IsChecked == true)
+
+            using StreamWriter writer = File.CreateText(@"C:\Users\cedri\Desktop\boodschap.txt"); // Maak een bestand aan met de naam boodschap
+
+            foreach (var message in messages)
             {
-                messages.Add(new Tuple<string, string>(cbx2.Content.ToString(), "B"));
+                writer.WriteLine(message.Item1 + "," + message.Item2);
             }
 
             return messages;
@@ -93,27 +115,10 @@ namespace Cédric_Vindevogel___Project_OOP
 
         private void SendData()
         {
-            foreach (var message in GetSelectedMessages())
+            foreach (var message in GetSelectedMessages()) // Verstuur alle commando's waarvan de checkbox is aangevinkt.
             {
-                // Berichttekst en pagina gebruiken om het commando samen te stellen
-                _serialPort.Write("<ID01><RP" + message.Item2 + ">" + message.Item1 + Convert.ToChar(13) + Convert.ToChar(10));
+                _serialPort.Write("<ID01><RP" + message.Item1 + ">" + message.Item2 + Convert.ToChar(13) + Convert.ToChar(10));
             }
-
-            //string cbx1text = "";
-            //string cbx2text = "";
-            //string pagina = "A";
-
-            //if (cbx1.IsChecked == true)
-            //{
-            //    cbx1text = (cbx1.Content.ToString());
-            //    _serialPort.Write("<ID01><RP" + pagina + ">" + cbx1text + Convert.ToChar(13) + Convert.ToChar(10));
-            //}
-
-            //if (cbx2.IsChecked == true)
-            //{
-            //    cbx2text = (cbx2.Content.ToString());
-            //    _serialPort.Write("<ID01><RP" + pagina + ">" + cbx2text + Convert.ToChar(13) + Convert.ToChar(10));
-            //}
         }
     }
 }
