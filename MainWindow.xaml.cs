@@ -49,17 +49,25 @@ namespace Cédric_Vindevogel___Project_OOP
 
         private void cbxComPorts_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_serialPort != null)
+            try
             {
-                if (_serialPort.IsOpen)
-                    _serialPort.Close();
-
-                if (cbxComPorts.SelectedItem.ToString() != "None")
+                if (_serialPort != null)
                 {
-                    _serialPort.PortName = cbxComPorts.SelectedItem.ToString();
-                    _serialPort.Open();
+                    if (_serialPort.IsOpen)
+                        _serialPort.Close();
+
+                    if (cbxComPorts.SelectedItem.ToString() != "None")
+                    {
+                        _serialPort.PortName = cbxComPorts.SelectedItem.ToString();
+                        _serialPort.Open();
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Kies de juiste seriële poort.");
+            }
+
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
@@ -115,9 +123,16 @@ namespace Cédric_Vindevogel___Project_OOP
 
         private void SendData()
         {
-            foreach (var message in GetSelectedMessages()) // Verstuur alle commando's waarvan de checkbox is aangevinkt.
+            try
             {
-                _serialPort.Write("<ID01><RP" + message.Item1 + ">" + message.Item2 + Convert.ToChar(13) + Convert.ToChar(10));
+                foreach (var message in GetSelectedMessages()) // Verstuur alle commando's waarvan de checkbox is aangevinkt.
+                {
+                    _serialPort.Write("<ID01><RP" + message.Item1 + ">" + message.Item2 + Convert.ToChar(13) + Convert.ToChar(10));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Kies eerst een seriële poort.");
             }
         }
     }
