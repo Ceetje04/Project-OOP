@@ -15,6 +15,9 @@ using System.Windows.Shapes;
 using System.IO.Ports;
 using System.Drawing;
 using System.IO;
+using System.Timers;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace Cédric_Vindevogel___Project_OOP
 {
@@ -24,6 +27,9 @@ namespace Cédric_Vindevogel___Project_OOP
     public partial class MainWindow : Window
     {
         SerialPort _serialPort;
+        private DispatcherTimer _timer;
+        private int _currentPageIndex = 0;
+        private List<Tuple<string, string>> _messages;
 
         public MainWindow()
         {
@@ -35,6 +41,12 @@ namespace Cédric_Vindevogel___Project_OOP
             foreach (string port in SerialPort.GetPortNames())
                 cbxComPorts.Items.Add(port);
         }
+
+        //private void Window_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    LoadSerialPorts();
+        //    StartSwitchingPages();
+        //}
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -60,6 +72,7 @@ namespace Cédric_Vindevogel___Project_OOP
                     {
                         _serialPort.PortName = cbxComPorts.SelectedItem.ToString();
                         _serialPort.Open();
+                        SwitchPage();
                     }
                 }
             }
@@ -79,33 +92,29 @@ namespace Cédric_Vindevogel___Project_OOP
 
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
-            SendData();
+            try
+            {
+                foreach (var message in SelectedMessages()) // Verstuur alle tekst van de checkboxen die zijn aangevinkt.
+                {
+                    _serialPort.Write("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "     " + Convert.ToChar(13) + Convert.ToChar(10));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Kies eerst een seriële poort.");
+            }
         }
 
-        private List<Tuple<string, string>> GetSelectedMessages() // Maakt een lijst van berichten en de pagina waarbij ze horen.
+        private List<Tuple<string, string>> SelectedMessages() // Maakt een lijst van berichten en de pagina waarbij ze horen.
         {
             var messages = new List<Tuple<string, string>>(); // Tuple is om meedere dingen samen te versturen.
 
-            //if (cbx1.IsChecked == true) // Als de checkbox is aangevinkt.
-            //{
-            //    messages.Add(new Tuple<string, string>("A", cbx1.Content.ToString()));
-            //}
-            //if (cbx2.IsChecked == true)
-            //{
-            //    messages.Add(new Tuple<string, string>("B", cbx2.Content.ToString()));
-            //}
-            ////if (cbx3.IsChecked == true)
-            ////{
-            ////    messages.Add(new Tuple<string, string>("C", cbx3.Content.ToString()));
-            ////}
-            ///
-
-            int pageNumber = 1;
+            int pageNumber = 0;
             foreach (CheckBox cb in lbxLichtkrant.Items) // Voor alle checkboxes in de list wordt deze code doorlopen.
             {
                 if (cb.IsChecked == true) // Als de checkbox is aangevinkt wordt een nieuwe boodschap toegevoegd aan de list.
                 {
-                    string pageLetter = ((char)('A' + pageNumber - 1)).ToString(); // Bereken de paginaletter op basis van het paginanummer.
+                    string pageLetter = ((char)('A' + pageNumber)).ToString(); // Bereken de paginaletter op basis van het paginanummer.
                     messages.Add(new Tuple<string, string>(pageLetter, cb.Content.ToString())); // Voeg het bericht toe aan de lijst met de juiste paginainformatie.
                     pageNumber++; // Verhoog het paginanummer voor de volgende checkbox.
                 }
@@ -121,19 +130,29 @@ namespace Cédric_Vindevogel___Project_OOP
             return messages;
         }
 
-        private void SendData()
+        private void SwitchPage()
         {
-            try
+            _messages = SelectedMessages(); // Bewaar de geselecteerde berichten in een veld.
+
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromSeconds(2);
+            _timer.Start(); // start de timer
+            _timer.Tick += (sender, args) =>
             {
-                foreach (var message in GetSelectedMessages()) // Verstuur alle commando's waarvan de checkbox is aangevinkt.
+                if (_currentPageIndex < _messages.Count) // Als er nog pagina's zijn om te verzenden.
                 {
-                    _serialPort.Write("<ID01><RP" + message.Item1 + ">" + message.Item2 + Convert.ToChar(13) + Convert.ToChar(10));
+                    var message = _messages[_currentPageIndex];
+
+                    _serialPort.Write("<ID01><RP" + message.Item1 + ">"+ Convert.ToChar(13) + Convert.ToChar(10));
+
+                    _currentPageIndex++; // Verhoog de huidige pagina-index voor de volgende verzending.
+
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Kies eerst een seriële poort.");
-            }
+                else // Als alle pagina's zijn verzonden.
+                {
+                    _currentPageIndex = 0; // Reset de pagina-index.
+                }
+            };
         }
     }
 }
