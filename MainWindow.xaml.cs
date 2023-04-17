@@ -26,16 +26,17 @@ namespace Cédric_Vindevogel___Project_OOP
     /// </summary>
     public partial class MainWindow : Window
     {
-        SerialPort _serialPort;
+        /*SerialPort _serialPort*/
         private DispatcherTimer _timer;
         private int _currentPageIndex = 0;
         private List<Tuple<string, string>> _messages;
+        SeriëlePoort _serial = new SeriëlePoort();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _serialPort = new SerialPort();
+            //_serialPort = new SerialPort();
 
             cbxComPorts.Items.Add("None");
             foreach (string port in SerialPort.GetPortNames())
@@ -48,39 +49,60 @@ namespace Cédric_Vindevogel___Project_OOP
         //    StartSwitchingPages();
         //}
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if ((_serialPort != null) && (_serialPort.IsOpen))
-            {
-                _serialPort.Write(new byte[] { 0 }, 0, 1);
+        //private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        //{
+        //    if ((_serial != null) && (_serialPort.IsOpen))
+        //    {
+        //        _serialPort.Write(new byte[] { 0 }, 0, 1);
 
-                // Gooi alle info van de _serialPort in de vuilbak.
-                _serialPort.Dispose();
-            }
-        }
+        //        // Gooi alle info van de _serialPort in de vuilbak.
+        //        _serialPort.Dispose();
+        //    }
+        //}
 
         private void cbxComPorts_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
-                if (_serialPort != null)
+                if (cbxComPorts.SelectedItem.ToString() != "None")
                 {
-                    if (_serialPort.IsOpen)
-                        _serialPort.Close();
-
-                    if (cbxComPorts.SelectedItem.ToString() != "None")
-                    {
-                        _serialPort.PortName = cbxComPorts.SelectedItem.ToString();
-                        _serialPort.Open();
-                        SwitchPage();
-                    }
+                    _serial.OpenPoort(cbxComPorts.SelectedItem.ToString());
+                    SwitchPage();
+                }
+                else
+                {
+                    _serial.SluitPoort();
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Kies de juiste seriële poort.");
-            }
+            } 
+            //try
+            //{
+            //    if (_serialPort != null)
+            //    {
+            //        if (_serialPort.IsOpen)
+            //            _serialPort.Close();
 
+            //        if (cbxComPorts.SelectedItem.ToString() != "None")
+            //        {
+            //            _serialPort.PortName = cbxComPorts.SelectedItem.ToString();
+            //            _serialPort.Open();
+            //            SwitchPage();
+            //        }
+            //        //if (cbxComPorts.SelectedItem != null)
+            //        //{
+            //        //    string selectedPoort = cbxComPorts.SelectedItem.ToString();
+            //        //    SeriëlePoort serial = new SeriëlePoort();
+            //        //    serial.OpenPoort(selectedPoort);
+            //        //}
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show("Kies de juiste seriële poort.");
+            //}
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
@@ -94,9 +116,10 @@ namespace Cédric_Vindevogel___Project_OOP
         {
             try
             {
+                SwitchPage();
                 foreach (var message in SelectedMessages()) // Verstuur alle tekst van de checkboxen die zijn aangevinkt.
                 {
-                    _serialPort.Write("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "     " + Convert.ToChar(13) + Convert.ToChar(10));
+                    _serial.Write("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "     " + Convert.ToChar(13) + Convert.ToChar(10));
                 }
             }
             catch (Exception ex)
@@ -130,7 +153,7 @@ namespace Cédric_Vindevogel___Project_OOP
             return messages;
         }
 
-        private void SwitchPage()
+        public void SwitchPage()
         {
             _messages = SelectedMessages(); // Bewaar de geselecteerde berichten in een veld.
 
@@ -143,7 +166,7 @@ namespace Cédric_Vindevogel___Project_OOP
                 {
                     var message = _messages[_currentPageIndex];
 
-                    _serialPort.Write("<ID01><RP" + message.Item1 + ">"+ Convert.ToChar(13) + Convert.ToChar(10));
+                    _serial.Write("<ID01><RP" + message.Item1 + ">"+ Convert.ToChar(13) + Convert.ToChar(10));
 
                     _currentPageIndex++; // Verhoog de huidige pagina-index voor de volgende verzending.
 
