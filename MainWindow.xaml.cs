@@ -18,6 +18,7 @@ using System.IO;
 using System.Timers;
 using System.Threading;
 using System.Windows.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Cédric_Vindevogel___Project_OOP
 {
@@ -30,13 +31,19 @@ namespace Cédric_Vindevogel___Project_OOP
         private DispatcherTimer _timer;
         private int _currentPageIndex = 0;
         private List<Tuple<string, string>> _messages;
+
         SeriëlePoort _serial = new SeriëlePoort();
+        //private SeriëlePoort _serial;
+        //private SeriëlePoortOntvangen _ontvanger;
 
         public MainWindow()
         {
             InitializeComponent();
 
             //_serialPort = new SerialPort();
+            _serial = new SeriëlePoort();
+            //_ontvanger = new SeriëlePoortOntvangen();
+            //_serial.DataReceived += _ontvanger.OntvangData;
 
             cbxComPorts.Items.Add("None");
             foreach (string port in SerialPort.GetPortNames())
@@ -74,9 +81,9 @@ namespace Cédric_Vindevogel___Project_OOP
                     _serial.SluitPoort();
                 }
             }
-            catch (Exception ex)
+            catch (LicktkrantException ex)
             {
-                MessageBox.Show("Kies de juiste seriële poort.");
+                MessageBox.Show(ex.Message);
             } 
             //try
             //{
@@ -119,7 +126,8 @@ namespace Cédric_Vindevogel___Project_OOP
                 SwitchPage();
                 foreach (var message in SelectedMessages()) // Verstuur alle tekst van de checkboxen die zijn aangevinkt.
                 {
-                    _serial.Write("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "     " + Convert.ToChar(13) + Convert.ToChar(10));
+                    _serial.Schrijf("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "     " + Convert.ToChar(13) + Convert.ToChar(10));
+                    Thread.Sleep(1000);
                 }
             }
             catch (Exception ex)
@@ -158,7 +166,7 @@ namespace Cédric_Vindevogel___Project_OOP
             _messages = SelectedMessages(); // Bewaar de geselecteerde berichten in een veld.
 
             _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(2);
+            _timer.Interval = TimeSpan.FromSeconds(25);
             _timer.Start(); // start de timer
             _timer.Tick += (sender, args) =>
             {
@@ -166,7 +174,7 @@ namespace Cédric_Vindevogel___Project_OOP
                 {
                     var message = _messages[_currentPageIndex];
 
-                    _serial.Write("<ID01><RP" + message.Item1 + ">"+ Convert.ToChar(13) + Convert.ToChar(10));
+                    _serial.Schrijf("<ID01><RP" + message.Item1 + ">"+ Convert.ToChar(13) + Convert.ToChar(10));
 
                     _currentPageIndex++; // Verhoog de huidige pagina-index voor de volgende verzending.
 

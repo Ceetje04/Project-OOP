@@ -1,16 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="Cédric_Vindevogel___Project_OOP.SeriëlePoort">
-    <Position X="6.25" Y="1.5" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAQAAAAAAAAAAAAAIAAACAAAAAAAAAAAAAAAAEA=</HashCode>
-      <FileName>SeriëlePoort.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Cédric_Vindevogel___Project_OOP.SeriëlePoortOntvangen">
     <Position X="4.25" Y="4.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>SeriëlePoortOntvangen.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -19,6 +12,13 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>SeriëlePoortVerzenden.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Cédric_Vindevogel___Project_OOP.SeriëlePoort">
+    <Position X="6.25" Y="1.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAIAAACAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>SeriëlePoort.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
