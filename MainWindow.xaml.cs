@@ -27,96 +27,104 @@ namespace Cédric_Vindevogel___Project_OOP
     /// </summary>
     public partial class MainWindow : Window
     {
-        /*SerialPort _serialPort*/
+        private SerialPort _serialPort;
+
         private DispatcherTimer _timer;
         private int _currentPageIndex = 0;
         private List<Tuple<string, string>> _messages;
-
-        SeriëlePoort _serial = new SeriëlePoort();
-        //private SeriëlePoort _serial;
-        //private SeriëlePoortOntvangen _ontvanger;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            //_serialPort = new SerialPort();
-            _serial = new SeriëlePoort();
-            //_ontvanger = new SeriëlePoortOntvangen();
-            //_serial.DataReceived += _ontvanger.OntvangData;
+            // Maak een nieuwe serialport aan.
+            _serialPort = new SerialPort();
+
+            // Komt er data binnen op de seriële poort, vang ze op...
+            _serialPort.DataReceived += _serialPort_DataReceived;
+
 
             cbxComPorts.Items.Add("None");
-            foreach (string port in SerialPort.GetPortNames())
+            foreach (string port in SerialPort.GetPortNames()) // Zoek de beschikbare poorten.
+            {
                 cbxComPorts.Items.Add(port);
+            }
         }
-
-        //private void Window_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    LoadSerialPorts();
-        //    StartSwitchingPages();
-        //}
-
-        //private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        //{
-        //    if ((_serial != null) && (_serialPort.IsOpen))
-        //    {
-        //        _serialPort.Write(new byte[] { 0 }, 0, 1);
-
-        //        // Gooi alle info van de _serialPort in de vuilbak.
-        //        _serialPort.Dispose();
-        //    }
-        //}
 
         private void cbxComPorts_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
-                if (cbxComPorts.SelectedItem.ToString() != "None")
+                if (_serialPort != null)
                 {
-                    _serial.OpenPoort(cbxComPorts.SelectedItem.ToString());
-                    SwitchPage();
-                }
-                else
-                {
-                    _serial.SluitPoort();
+                    // Start de seriele poort als hij beschikbaar is.
+                    if (_serialPort.IsOpen)
+                        _serialPort.Close();
+
+                    if (cbxComPorts.SelectedItem.ToString() != "None")
+                    {
+                        _serialPort.PortName = cbxComPorts.SelectedItem.ToString();
+                        _serialPort.Open();
+                    }
                 }
             }
-            catch (LicktkrantException ex)
+            catch (InvalidOperationException ex) // Als de er geen geldige poort gekozen is of de poort is al in gebruik.
+            {
+                MessageBox.Show("Kies een geldige COM-poort die nog niet in gebruik is.");
+            }
+        }
+
+        public void _serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            // Lees alle tekst in, tot je een 'nieuwe lijn symbool' binnenkrijgt.
+            // New line = '\n' = ASCII-waarde 10 = ALT 10.
+            string receivedText = _serialPort.ReadLine();
+
+            // Geef de ontvangen data door aan een method die op de UI thread loopt.
+            // Doe dat via een Action delegate... Delegates en Events zullen 
+            // in detail behandeld worden in het vak OOP.
+            Dispatcher.Invoke(new Action<string>(LabelControle), receivedText);
+        }
+
+        private void btnStart_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Als de seriale poort beschikbaar is en wordt data verstuurd dan mag de tweede window geopend worden.
+                if ((_serialPort.IsOpen) && (_serialPort != null))
+                {
+                    btnStart.Background = new SolidColorBrush(Colors.Green);
+                    SwitchPage();
+                }
+
+                else
+                {
+                    btnStart.Background = new SolidColorBrush(Colors.Red);
+                    throw new GeenCOMPoortException();
+                }
+            }
+            catch (GeenCOMPoortException ex) // Geef een waarschuwing wanneer er geen COM-poort geselecteerd is.
             {
                 MessageBox.Show(ex.Message);
-            } 
-            //try
-            //{
-            //    if (_serialPort != null)
-            //    {
-            //        if (_serialPort.IsOpen)
-            //            _serialPort.Close();
-
-            //        if (cbxComPorts.SelectedItem.ToString() != "None")
-            //        {
-            //            _serialPort.PortName = cbxComPorts.SelectedItem.ToString();
-            //            _serialPort.Open();
-            //            SwitchPage();
-            //        }
-            //        //if (cbxComPorts.SelectedItem != null)
-            //        //{
-            //        //    string selectedPoort = cbxComPorts.SelectedItem.ToString();
-            //        //    SeriëlePoort serial = new SeriëlePoort();
-            //        //    serial.OpenPoort(selectedPoort);
-            //        //}
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show("Kies de juiste seriële poort.");
-            //}
+            }
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
-            CheckBox item = new CheckBox();
-            item.Content = tbxToevoegen.Text;
-            lbxLichtkrant.Items.Add(item);
+            try
+            {
+                CheckBox item = new CheckBox();
+                if (tbxToevoegen.Text.Contains("€") || tbxToevoegen.Text.Contains("é") || tbxToevoegen.Text.Contains("ë") || tbxToevoegen.Text.Contains("£"));
+                {
+                    throw new OngeldigeTekensException();
+                }
+                item.Content = tbxToevoegen.Text;
+                lbxLichtkrant.Items.Add(item);
+            }
+            catch (OngeldigeTekensException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
@@ -126,14 +134,18 @@ namespace Cédric_Vindevogel___Project_OOP
                 SwitchPage();
                 foreach (var message in SelectedMessages()) // Verstuur alle tekst van de checkboxen die zijn aangevinkt.
                 {
-                    _serial.Schrijf("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "     " + Convert.ToChar(13) + Convert.ToChar(10));
-                    Thread.Sleep(1000);
+                    _serialPort.Write("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "     " + Convert.ToChar(13) + Convert.ToChar(10));
+                    //Thread.Sleep(1000);
                 }
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
-                MessageBox.Show("Kies eerst een seriële poort.");
+                MessageBox.Show("Fout bij het openen van seriële poort.");
             }
+            //catch (GeenCOMPoortException ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
         }
 
         private List<Tuple<string, string>> SelectedMessages() // Maakt een lijst van berichten en de pagina waarbij ze horen.
@@ -174,7 +186,7 @@ namespace Cédric_Vindevogel___Project_OOP
                 {
                     var message = _messages[_currentPageIndex];
 
-                    _serial.Schrijf("<ID01><RP" + message.Item1 + ">"+ Convert.ToChar(13) + Convert.ToChar(10));
+                    _serialPort.Write("<ID01><RP" + message.Item1 + ">"+ Convert.ToChar(13) + Convert.ToChar(10));
 
                     _currentPageIndex++; // Verhoog de huidige pagina-index voor de volgende verzending.
 
@@ -184,6 +196,22 @@ namespace Cédric_Vindevogel___Project_OOP
                     _currentPageIndex = 0; // Reset de pagina-index.
                 }
             };
+        }
+
+        private void LabelControle(string data)
+        {
+            lblControle.Content = data;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if ((_serialPort != null) && (_serialPort.IsOpen))
+            {
+                _serialPort.Write(new byte[] { 0 }, 0, 1);
+
+                // Gooi alle info van de _serialPort in de vuilbak.
+                _serialPort.Dispose();
+            }
         }
     }
 }

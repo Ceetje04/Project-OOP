@@ -7,10 +7,13 @@
         mc:Ignorable="d"
         Title="Project OOP" SizeToContent="Height" Width="500" FontSize="18">
     <StackPanel Margin="10">
-        <GroupBox Header="COM-port">
-            <ComboBox Name="cbxComPorts" Margin="10" SelectionChanged="cbxComPorts_SelectionChanged"></ComboBox>
+        <GroupBox Header="COM-poort">
+            <StackPanel>
+                <ComboBox Name="cbxComPorts" Margin="10" SelectionChanged="cbxComPorts_SelectionChanged"></ComboBox>
+                <Button Name="btnStart" Content="Verbind met lichtkrant" Margin="10" Click="btnStart_Click"></Button>
+            </StackPanel>
         </GroupBox>
-        <GroupBox Header="Bestuur lichtkrant">
+        <GroupBox Header="Bestuuring lichtkrant">
             <StackPanel>
                 <TextBox Name="tbxToevoegen" Margin="10"/>
                 <Button Name="btnAdd" Content="Toevoegen" Margin="10" Click="btnAdd_Click"/>

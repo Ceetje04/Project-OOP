@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Cédric_Vindevogel___Project_OOP
 {
-    public class SeriëlePoortOntvangen: SeriëlePoort
-    {
-        //public string OntvangData()
-        //{
-        //    return _serialPort.ReadLine();
-        //}
-    }
+    //public class SeriëlePoortOntvangen: SeriëlePoort
+    //{
+    //    //public string OntvangData()
+    //    //{
+    //    //    return _serialPort.ReadLine();
+    //    //}
+    //}
 
 }

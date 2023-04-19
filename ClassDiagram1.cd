@@ -21,5 +21,26 @@
       <FileName>SeriëlePoort.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="Cédric_Vindevogel___Project_OOP.COMPoortInGebruikException" Collapsed="true">
+    <Position X="9" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exception.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Cédric_Vindevogel___Project_OOP.GeenCOMPoortException" Collapsed="true">
+    <Position X="10.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exception.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Cédric_Vindevogel___Project_OOP.OngeldigeTekensException" Collapsed="true">
+    <Position X="9" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exception.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
