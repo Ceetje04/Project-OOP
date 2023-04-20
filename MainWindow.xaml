@@ -10,18 +10,19 @@
         <GroupBox Header="COM-poort">
             <StackPanel>
                 <ComboBox Name="cbxComPorts" Margin="10" SelectionChanged="cbxComPorts_SelectionChanged"></ComboBox>
-                <Button Name="btnStart" Content="Verbind met lichtkrant" Margin="10" Click="btnStart_Click"></Button>
+                <Button Name="btnStart" Content="Verbind met lichtkrant" Margin="10" Background="LightBlue" Click="btnStart_Click"></Button>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="Bestuuring lichtkrant">
             <StackPanel>
                 <TextBox Name="tbxToevoegen" Margin="10"/>
-                <Button Name="btnAdd" Content="Toevoegen" Margin="10" Click="btnAdd_Click"/>
-                <ListBox x:Name="lbxLichtkrant" Margin="10">
+                <Button Name="btnAdd" Content="Toevoegen" Margin="10" Background="LightGreen" Click="btnAdd_Click"/>
+                <ListBox x:Name="lbxLichtkrant" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" MaxHeight="250">
                     <CheckBox Name="cbx1" Content="Elektronici zijn cool!" HorizontalAlignment="Center" IsChecked="True"></CheckBox>
                     <CheckBox Name="cbx2" Content="STUW voetbaltornooi" HorizontalAlignment="Center" IsChecked="True"></CheckBox>
                 </ListBox>
-                <Button Name="btnUpdate" Content="Update lichtkrant" Margin="10" Click="btnUpdate_Click"></Button>
+                <Button Name="btnVerwijderen" Content="Verwijder" Background="LightSalmon" Margin="10" Click="btnVerwijderen_Click"></Button>
+                <Button Name="btnUpdate" Content="Update lichtkrant" Margin="10" Background="LightBlue" Click="btnUpdate_Click"></Button>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="Controle">

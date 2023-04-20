@@ -93,10 +93,9 @@ namespace Cédric_Vindevogel___Project_OOP
                 // Als de seriale poort beschikbaar is en wordt data verstuurd dan mag de tweede window geopend worden.
                 if ((_serialPort.IsOpen) && (_serialPort != null))
                 {
-                    btnStart.Background = new SolidColorBrush(Colors.Green);
+                    btnStart.Background = new SolidColorBrush(Colors.LightGreen);
                     SwitchPage();
                 }
-
                 else
                 {
                     btnStart.Background = new SolidColorBrush(Colors.Red);
@@ -114,12 +113,13 @@ namespace Cédric_Vindevogel___Project_OOP
             try
             {
                 CheckBox item = new CheckBox();
-                if (tbxToevoegen.Text.Contains("€") || tbxToevoegen.Text.Contains("é") || tbxToevoegen.Text.Contains("ë") || tbxToevoegen.Text.Contains("£"));
+                item.Content = tbxToevoegen.Text;
+                lbxLichtkrant.Items.Add(item);
+                if (tbxToevoegen.Text.Contains("€") || tbxToevoegen.Text.Contains("é") || tbxToevoegen.Text.Contains("ë") || tbxToevoegen.Text.Contains("£"))
                 {
                     throw new OngeldigeTekensException();
                 }
-                item.Content = tbxToevoegen.Text;
-                lbxLichtkrant.Items.Add(item);
+
             }
             catch (OngeldigeTekensException ex)
             {
@@ -132,10 +132,11 @@ namespace Cédric_Vindevogel___Project_OOP
             try
             {
                 SwitchPage();
+                ReadMessages();
                 foreach (var message in SelectedMessages()) // Verstuur alle tekst van de checkboxen die zijn aangevinkt.
                 {
                     _serialPort.Write("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "     " + Convert.ToChar(13) + Convert.ToChar(10));
-                    //Thread.Sleep(1000);
+                    Thread.Sleep(1000);
                 }
             }
             catch (InvalidOperationException ex)
@@ -146,6 +147,13 @@ namespace Cédric_Vindevogel___Project_OOP
             //{
             //    MessageBox.Show(ex.Message);
             //}
+        }
+
+        private void ReadMessages()
+        {
+            var messages = new List<Tuple<string, string>>();
+            using StreamReader reader = File.OpenText(@"C:\Users\cedri\Desktop\boodschap.txt");
+            string line;
         }
 
         private List<Tuple<string, string>> SelectedMessages() // Maakt een lijst van berichten en de pagina waarbij ze horen.
@@ -163,14 +171,19 @@ namespace Cédric_Vindevogel___Project_OOP
                 }
             }
 
+            SaveMessages(messages);
+
+            return messages;
+        }
+
+        private void SaveMessages(List<Tuple<string, string>> messages)
+        {
             using StreamWriter writer = File.CreateText(@"C:\Users\cedri\Desktop\boodschap.txt"); // Maak een bestand aan met de naam boodschap
 
             foreach (var message in messages)
             {
                 writer.WriteLine(message.Item1 + "," + message.Item2);
             }
-
-            return messages;
         }
 
         public void SwitchPage()
@@ -196,6 +209,13 @@ namespace Cédric_Vindevogel___Project_OOP
                     _currentPageIndex = 0; // Reset de pagina-index.
                 }
             };
+        }
+
+        private void btnVerwijderen_Click(object sender, RoutedEventArgs e)
+        {
+            object selectedItem = lbxLichtkrant.SelectedItem;
+            if (selectedItem != null)
+                lbxLichtkrant.Items.Remove(selectedItem);
         }
 
         private void LabelControle(string data)
