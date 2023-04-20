@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Cédric_Vindevogel___Project_OOP
 {
+    // Klasse om specifieke fouten rond de COM-poort af te handelen.
     public class GeenCOMPoortException : InvalidOperationException
     {
         public GeenCOMPoortException()

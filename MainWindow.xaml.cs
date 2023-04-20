@@ -27,11 +27,14 @@ namespace Cédric_Vindevogel___Project_OOP
     /// </summary>
     public partial class MainWindow : Window
     {
-        private SerialPort _serialPort;
+        private SerialPort _serialPort; // Variabele voor seriële poort.
 
         private DispatcherTimer _timer;
-        private int _currentPageIndex = 0;
         private List<Tuple<string, string>> _messages;
+
+        int _currentPageIndex = 0; // Variabele voor huidige pagina van de lichtkrant in cijfers.
+        int pageNumber = 0; // Variabele voor huidige pagina van de lichtkrant in cijfers.
+        string pageLetter; // Variabele pageletter voor de pagina van de lichtkrant
 
         public MainWindow()
         {
@@ -94,7 +97,7 @@ namespace Cédric_Vindevogel___Project_OOP
                 if ((_serialPort.IsOpen) && (_serialPort != null))
                 {
                     btnStart.Background = new SolidColorBrush(Colors.LightGreen);
-                    SwitchPage();
+                    SwitchPage(); // Start de method switchpage van zodra er op de knop gedrukt wordt.
                 }
                 else
                 {
@@ -108,19 +111,22 @@ namespace Cédric_Vindevogel___Project_OOP
             }
         }
 
-        private void btnAdd_Click(object sender, RoutedEventArgs e)
+        private void btnToevoegen_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                CheckBox item = new CheckBox();
+                CheckBox item = new CheckBox(); // Variabele item aanmaken voor een nieuwe textbox.
+                // Als de textbox één van volgende tekens bevat. 
                 if (tbxToevoegen.Text.Contains("€") || tbxToevoegen.Text.Contains("é") || tbxToevoegen.Text.Contains("ë") || tbxToevoegen.Text.Contains("£"))
                 {
                     throw new OngeldigeTekensException();
                 }
+                // Als de textbox leeg is of alleen spaties bevat.
                 if (string.IsNullOrWhiteSpace(tbxToevoegen.Text))
                 {
                     throw new GeenInvoerException();
                 }
+                // Als aan alle voorwaarden voldaan is wordt er een checkbox toegevoegd.
                 else
                 {
                     lbxLichtkrant.Items.Add(item);
@@ -141,11 +147,11 @@ namespace Cédric_Vindevogel___Project_OOP
         {
             try
             {
-                SwitchPage();
-                foreach (var message in SelectedMessages()) // Verstuur alle tekst van de checkboxen die zijn aangevinkt.
+                foreach (var message in SelectedMessages()) // Lus waar alle geselcteerde berichten worden opgehaald uit de list.
                 {
+                    // Voor elke geselecteerde checkbox wordt het protocol verstuurd.
                     _serialPort.Write("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "      " + Convert.ToChar(13) + Convert.ToChar(10));
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1000); // Wacht één seconde omdat de communicatie anders te snel gaat voor de lichtkrant.
                 }
             }
             catch (InvalidOperationException ex)
@@ -156,31 +162,30 @@ namespace Cédric_Vindevogel___Project_OOP
 
         private List<Tuple<string, string>> SelectedMessages() // Maakt een lijst van berichten en de pagina waarbij ze horen.
         {
-            var messages = new List<Tuple<string, string>>(); // Tuple is om meedere dingen samen te versturen.
+            var messages = new List<Tuple<string, string>>(); // Tuple is om meedere onjecten samen te versturen. Maak een nieuwe lijst aan.
 
-            int pageNumber = 0;
-            foreach (CheckBox cb in lbxLichtkrant.Items) // Voor alle checkboxes in de list wordt deze code doorlopen.
+            foreach (CheckBox cb in lbxLichtkrant.Items) // Lus waarin alle checkboxes worden doorlopen.
             {
-                if (cb.IsChecked == true) // Als de checkbox is aangevinkt wordt een nieuwe boodschap toegevoegd aan de list.
+                if (cb.IsChecked == true) // Enkel van de checkboxes die zijn aangevinkt wordt de boodschap opgeslagen in de list.
                 {
-                    string pageLetter = ((char)('A' + pageNumber)).ToString(); // Bereken de paginaletter op basis van het paginanummer.
+                    pageLetter = ((char)('A' + pageNumber)).ToString(); // Bereken de paginaletter op basis van het paginanummer. Je gaat dus van cijfers naar letters.
                     messages.Add(new Tuple<string, string>(pageLetter, cb.Content.ToString())); // Voeg het bericht toe aan de lijst met de juiste paginainformatie.
                     pageNumber++; // Verhoog het paginanummer voor de volgende checkbox.
                 }
             }
 
-            SaveMessages(messages);
+            SaveMessages(messages); // De aangemaakte lijst wordt opgeslagen.
 
-            return messages;
+            return messages; // De lijst wordt geretourneerd voor de update method.
         }
 
-        private void SaveMessages(List<Tuple<string, string>> messages)
+        private void SaveMessages(List<Tuple<string, string>> messages) // Deze methode neemt de aangemaakte lijst als invoer.
         {
-            using StreamWriter writer = File.CreateText(@"C:\Users\cedri\Desktop\boodschap.txt"); // Maak een bestand aan met de naam boodschap
+            using StreamWriter writer = File.CreateText(@"./boodschap.txt"); // Maak een bestand aan met de naam boodschap in de huidige programmafolder.
 
-            foreach (var message in messages)
+            foreach (var message in messages) // Lus die elke boodschap in de lijst zal opslaan.
             {
-                writer.WriteLine(message.Item1 + "," + message.Item2);
+                writer.WriteLine(message.Item1 + "," + message.Item2); // Sla eerst de paginaletter op daarna de tekst.
             }
         }
 
@@ -188,14 +193,14 @@ namespace Cédric_Vindevogel___Project_OOP
         {
             _messages = SelectedMessages(); // Bewaar de geselecteerde berichten in een veld.
 
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(25);
+            _timer = new DispatcherTimer(); // Maak een nieuwe dispatchtimer.
+            _timer.Interval = TimeSpan.FromSeconds(25); // De timer heeft een interval van 25 seconden.
             _timer.Start(); // start de timer
-            _timer.Tick += (sender, args) =>
+            _timer.Tick += (sender, args) => // Telkens wanneer er 25 seconden voorbij zijn.
             {
-                if (_currentPageIndex < _messages.Count) // Als er nog pagina's zijn om te verzenden.
+                if (_currentPageIndex < _messages.Count) // Als de huidige pagina kleiner is dan het totale aantal pagina's.
                 {
-                    var message = _messages[_currentPageIndex];
+                    var message = _messages[_currentPageIndex]; // De volgende pagina in de lijst wordt geselcteerd volgens currentPageIndex.
 
                     _serialPort.Write("<ID01><RP" + message.Item1 + ">"+ Convert.ToChar(13) + Convert.ToChar(10));
 
@@ -204,7 +209,7 @@ namespace Cédric_Vindevogel___Project_OOP
                 }
                 else // Als alle pagina's zijn verzonden.
                 {
-                    _currentPageIndex = 0; // Reset de pagina-index.
+                    _currentPageIndex = 0; // Reset de pagina-index. En begin opnieuw.
                 }
             };
         }
@@ -218,7 +223,7 @@ namespace Cédric_Vindevogel___Project_OOP
 
         private void LabelControle(string data)
         {
-            lblControle.Content = data;
+            lblControle.Content = data; // Toon de geretourneerde text van de lichtkrant op een label.
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

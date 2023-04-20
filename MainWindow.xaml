@@ -16,8 +16,8 @@
         <GroupBox Header="Bestuuring lichtkrant">
             <StackPanel>
                 <TextBox Name="tbxToevoegen" Margin="10"/>
-                <Button Name="btnAdd" Content="Toevoegen" Margin="10" Background="LightGreen" Click="btnAdd_Click"/>
-                <ListBox x:Name="lbxLichtkrant" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" MaxHeight="250">
+                <Button Name="btnToevoegen" Content="Toevoegen" Margin="10" Background="LightGreen" Click="btnToevoegen_Click"/>
+                <ListBox x:Name="lbxLichtkrant" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" MaxHeight="200">
                     <CheckBox Name="cbx1" Content="Elektronici zijn cool!" HorizontalAlignment="Center" IsChecked="True"></CheckBox>
                     <CheckBox Name="cbx2" Content="STUW voetbaltornooi" HorizontalAlignment="Center" IsChecked="True"></CheckBox>
                 </ListBox>
