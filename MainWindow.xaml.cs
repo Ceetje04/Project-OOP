@@ -113,15 +113,25 @@ namespace Cédric_Vindevogel___Project_OOP
             try
             {
                 CheckBox item = new CheckBox();
-                item.Content = tbxToevoegen.Text;
-                lbxLichtkrant.Items.Add(item);
                 if (tbxToevoegen.Text.Contains("€") || tbxToevoegen.Text.Contains("é") || tbxToevoegen.Text.Contains("ë") || tbxToevoegen.Text.Contains("£"))
                 {
                     throw new OngeldigeTekensException();
                 }
-
+                if (string.IsNullOrWhiteSpace(tbxToevoegen.Text))
+                {
+                    throw new GeenInvoerException();
+                }
+                else
+                {
+                    lbxLichtkrant.Items.Add(item);
+                    item.Content = tbxToevoegen.Text;
+                }
             }
             catch (OngeldigeTekensException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            catch (GeenInvoerException ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -132,10 +142,9 @@ namespace Cédric_Vindevogel___Project_OOP
             try
             {
                 SwitchPage();
-                ReadMessages();
                 foreach (var message in SelectedMessages()) // Verstuur alle tekst van de checkboxen die zijn aangevinkt.
                 {
-                    _serialPort.Write("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "     " + Convert.ToChar(13) + Convert.ToChar(10));
+                    _serialPort.Write("<ID01><P" + message.Item1 + ">" + "<SB>" + "<FS>" + message.Item2 + "      " + Convert.ToChar(13) + Convert.ToChar(10));
                     Thread.Sleep(1000);
                 }
             }
@@ -143,17 +152,6 @@ namespace Cédric_Vindevogel___Project_OOP
             {
                 MessageBox.Show("Fout bij het openen van seriële poort.");
             }
-            //catch (GeenCOMPoortException ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //}
-        }
-
-        private void ReadMessages()
-        {
-            var messages = new List<Tuple<string, string>>();
-            using StreamReader reader = File.OpenText(@"C:\Users\cedri\Desktop\boodschap.txt");
-            string line;
         }
 
         private List<Tuple<string, string>> SelectedMessages() // Maakt een lijst van berichten en de pagina waarbij ze horen.

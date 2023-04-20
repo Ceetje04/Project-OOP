@@ -7,15 +7,6 @@ using System.Threading.Tasks;
 
 namespace Cédric_Vindevogel___Project_OOP
 {
-    public class COMPoortInGebruikException : InvalidOperationException
-    {
-        public COMPoortInGebruikException()
-            : base("Kies een geldige COM-poort.")
-        {
-
-        }
-    }
-
     public class GeenCOMPoortException : InvalidOperationException
     {
         public GeenCOMPoortException()
@@ -29,6 +20,14 @@ namespace Cédric_Vindevogel___Project_OOP
     {
         public OngeldigeTekensException()
             : base("Gebruik geen tekens die niet in de ASCII-tabel staan.")
+        {
+        }
+    }
+
+    public class GeenInvoerException : ApplicationException
+    {
+        public GeenInvoerException()
+            : base("Geef eerst iets in in de textbox.")
         {
         }
     }
